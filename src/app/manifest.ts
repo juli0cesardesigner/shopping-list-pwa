@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Shopping List',
-    short_name: 'ShopList',
+    name: 'COMPRAR',
+    short_name: 'COMPRAR',
     description: 'Lista de compras minimalista',
     start_url: '/',
     display: 'standalone',
