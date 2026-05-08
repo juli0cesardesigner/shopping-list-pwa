@@ -44,6 +44,46 @@ export default function ShoppingList() {
     }
     
     init();
+
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel("items_channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "items" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            setItems((prev) => {
+              if (prev.some((i) => i.id === payload.new.id)) return prev;
+              
+              const tempIndex = prev.findIndex(
+                (i) => i.id.startsWith("temp-") && i.name === payload.new.name
+              );
+              
+              if (tempIndex >= 0) {
+                const newItems = [...prev];
+                newItems[tempIndex] = payload.new as Item;
+                return newItems;
+              }
+              
+              return [payload.new as Item, ...prev];
+            });
+          } else if (payload.eventType === "UPDATE") {
+            setItems((prev) =>
+              prev.map((i) => (i.id === payload.new.id ? (payload.new as Item) : i))
+            );
+          } else if (payload.eventType === "DELETE") {
+            setItems((prev) =>
+              prev.filter((i) => i.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
 
