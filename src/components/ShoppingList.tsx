@@ -46,12 +46,7 @@ export default function ShoppingList() {
     init();
   }, []);
 
-  useEffect(() => {
-    if (isAddModalOpen && inputRef.current) {
-      // Focus the input when modal opens
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
-  }, [isAddModalOpen]);
+
 
   async function fetchItems() {
     const { data, error } = await supabase
@@ -317,7 +312,10 @@ export default function ShoppingList() {
 
       {/* FAB - Centered Floating Action Button for adding items */}
       <button
-        onClick={() => setIsAddModalOpen(true)}
+        onClick={() => {
+          setIsAddModalOpen(true);
+          inputRef.current?.focus();
+        }}
         className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-xl flex items-center justify-center transition-transform active:scale-95"
         title="Adicionar item"
       >
@@ -325,23 +323,24 @@ export default function ShoppingList() {
       </button>
 
       {/* Add Item Modal */}
-      <AnimatePresence>
-        {isAddModalOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsAddModalOpen(false)}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed top-4 sm:top-1/2 left-1/2 -translate-x-1/2 sm:-translate-y-1/2 z-50 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-5 w-[92%] max-w-md"
-            >
-              <div className="flex justify-between items-center mb-4">
+      <>
+        <motion.div
+          initial={false}
+          animate={{ opacity: isAddModalOpen ? 1 : 0, pointerEvents: isAddModalOpen ? "auto" : "none" }}
+          onClick={() => setIsAddModalOpen(false)}
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+        />
+        <motion.div
+          initial={false}
+          animate={{ 
+            opacity: isAddModalOpen ? 1 : 0, 
+            scale: isAddModalOpen ? 1 : 0.95,
+            y: isAddModalOpen ? 0 : -20,
+            pointerEvents: isAddModalOpen ? "auto" : "none"
+          }}
+          className="fixed top-4 sm:top-1/2 left-1/2 -translate-x-1/2 sm:-translate-y-1/2 z-50 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-5 w-[92%] max-w-md"
+        >
+          <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold tracking-tight">Adicionar Item</h2>
                 <button 
                   onClick={() => setIsAddModalOpen(false)}
@@ -382,10 +381,8 @@ export default function ShoppingList() {
                   Adicionar
                 </button>
               </form>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+        </motion.div>
+      </>
     </div>
   );
 }
