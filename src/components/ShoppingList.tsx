@@ -336,12 +336,12 @@ export default function ShoppingList() {
               className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
             />
             <motion.div
-              initial={{ opacity: 0, y: 100, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 100, scale: 0.95 }}
-              className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-zinc-900 rounded-t-3xl shadow-2xl p-6 sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl sm:max-w-md sm:w-full"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-5 w-[92%] max-w-md"
             >
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold tracking-tight">Adicionar Item</h2>
                 <button 
                   onClick={() => setIsAddModalOpen(false)}
@@ -351,7 +351,7 @@ export default function ShoppingList() {
                 </button>
               </div>
               
-              <form onSubmit={handleAddItem} className="flex flex-col gap-4">
+              <form onSubmit={handleAddItem} className="flex flex-col gap-3">
                 <div>
                   <label className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1 block">O que você precisa comprar?</label>
                   <input
@@ -360,7 +360,7 @@ export default function ShoppingList() {
                     placeholder="Ex: Maçã"
                     value={newItemName}
                     onChange={(e) => setNewItemName(e.target.value)}
-                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   />
                 </div>
                 <div>
@@ -370,14 +370,14 @@ export default function ShoppingList() {
                     placeholder="Ex: 2kg, 3 unidades"
                     value={newItemQuantity}
                     onChange={(e) => setNewItemQuantity(e.target.value)}
-                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   />
                 </div>
                 
                 <button
                   type="submit"
                   disabled={!newItemName.trim()}
-                  className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-4 font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+                  className="mt-1 w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
                 >
                   Adicionar
                 </button>
