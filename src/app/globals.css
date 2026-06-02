@@ -23,5 +23,10 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     overscroll-behavior-y: contain; /* Prevents pull-to-refresh on mobile if desired */
+    
+    /* Intelligent Height & Safe Areas */
+    min-height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
   }
 }

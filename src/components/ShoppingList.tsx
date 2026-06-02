@@ -37,6 +37,28 @@ export default function ShoppingList() {
   const inputRef = useRef<HTMLInputElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
 
+  // Hook inteligente para detectar o espaço livre (acima do teclado)
+  const [visibleHeight, setVisibleHeight] = useState<number>(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    function handleViewportChange() {
+      if (window.visualViewport) {
+        setVisibleHeight(window.visualViewport.height);
+      }
+    }
+
+    window.visualViewport?.addEventListener("resize", handleViewportChange);
+    window.visualViewport?.addEventListener("scroll", handleViewportChange);
+    handleViewportChange();
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", handleViewportChange);
+      window.visualViewport?.removeEventListener("scroll", handleViewportChange);
+    };
+  }, []);
+
   useEffect(() => {
     async function init() {
       // Anonymous login
@@ -299,7 +321,7 @@ export default function ShoppingList() {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto flex flex-col min-h-[100dvh] relative px-4 pt-12 pb-32">
+    <div className="w-full max-w-md mx-auto flex flex-col min-h-[100dvh] relative px-4 pt-12 pb-[calc(8rem+env(safe-area-inset-bottom))]">
       {/* Header Simplificado */}
       <header className="mb-12 text-center">
         <h1 className="text-zinc-400 text-sm font-black uppercase tracking-[0.3em]">
@@ -517,12 +539,19 @@ export default function ShoppingList() {
             />
             <motion.div
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0, 
+                scale: visibleHeight < 500 ? 0.85 : 1,
+              }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 w-[94%] max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)]"
+              style={{ 
+                transformOrigin: 'top center',
+              }}
+              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 w-[94%] max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)] flex flex-col"
             >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold tracking-tight text-white">Adicionar</h2>
+              <div className="flex justify-between items-center mb-4 flex-shrink-0">
+                <h2 className="text-xl font-bold tracking-tight text-white">Adicionar</h2>
                 <button 
                   onClick={() => setIsAddModalOpen(false)}
                   className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
@@ -531,8 +560,8 @@ export default function ShoppingList() {
                 </button>
               </div>
               
-              <form onSubmit={handleAddItem} className="flex flex-col gap-5">
-                <div className="space-y-4">
+              <form onSubmit={handleAddItem} className={`flex flex-col ${visibleHeight < 600 ? 'gap-2' : 'gap-5'}`}>
+                <div className={visibleHeight < 600 ? 'space-y-2' : 'space-y-4'}>
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">O que comprar?</label>
                     <input
@@ -541,7 +570,7 @@ export default function ShoppingList() {
                       placeholder="Ex: Maçã"
                       value={newItemName}
                       onChange={(e) => setNewItemName(e.target.value)}
-                      className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white text-lg placeholder:text-zinc-600 font-medium"
+                      className={`w-full bg-white/5 border border-white/5 rounded-2xl px-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white placeholder:text-zinc-600 font-medium ${visibleHeight < 600 ? 'py-2.5 text-base' : 'py-4 text-lg'}`}
                     />
                   </div>
                   
@@ -636,12 +665,19 @@ export default function ShoppingList() {
             />
             <motion.div
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0, 
+                scale: visibleHeight < 500 ? 0.85 : 1,
+              }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 w-[94%] max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)]"
+              style={{ 
+                transformOrigin: 'top center',
+              }}
+              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 w-[94%] max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)] flex flex-col"
             >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold tracking-tight text-white">Editar Item</h2>
+              <div className="flex justify-between items-center mb-4 flex-shrink-0">
+                <h2 className="text-xl font-bold tracking-tight text-white">Editar Item</h2>
                 <button 
                   onClick={() => setEditingItem(null)}
                   className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
@@ -650,8 +686,8 @@ export default function ShoppingList() {
                 </button>
               </div>
               
-              <form onSubmit={handleEditItem} className="flex flex-col gap-5">
-                <div className="space-y-4">
+              <form onSubmit={handleEditItem} className={`flex flex-col ${visibleHeight < 600 ? 'gap-2' : 'gap-5'}`}>
+                <div className={visibleHeight < 600 ? 'space-y-2' : 'space-y-4'}>
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Nome do item</label>
                     <input
@@ -660,7 +696,7 @@ export default function ShoppingList() {
                       placeholder="Ex: Maçã"
                       value={editItemName}
                       onChange={(e) => setEditItemName(e.target.value)}
-                      className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white text-lg placeholder:text-zinc-600 font-medium"
+                      className={`w-full bg-white/5 border border-white/5 rounded-2xl px-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white placeholder:text-zinc-600 font-medium ${visibleHeight < 600 ? 'py-2.5 text-base' : 'py-4 text-lg'}`}
                     />
                   </div>
 
