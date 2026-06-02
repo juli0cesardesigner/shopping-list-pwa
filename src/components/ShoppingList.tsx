@@ -516,10 +516,10 @@ export default function ShoppingList() {
               className="fixed inset-0 bg-black/60 backdrop-blur-md z-40"
             />
             <motion.div
-              initial={{ opacity: 0, y: 100, scale: 0.95 }}
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 100, scale: 0.95 }}
-              className="fixed bottom-4 sm:bottom-auto sm:top-1/2 left-1/2 -translate-x-1/2 sm:-translate-y-1/2 z-50 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 w-[94%] max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)]"
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 w-[94%] max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)]"
             >
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold tracking-tight text-white">Adicionar</h2>
@@ -635,10 +635,10 @@ export default function ShoppingList() {
               className="fixed inset-0 bg-black/60 backdrop-blur-md z-40"
             />
             <motion.div
-              initial={{ opacity: 0, y: 100, scale: 0.95 }}
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 100, scale: 0.95 }}
-              className="fixed bottom-4 sm:bottom-auto sm:top-1/2 left-1/2 -translate-x-1/2 sm:-translate-y-1/2 z-50 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 w-[94%] max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)]"
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 w-[94%] max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)]"
             >
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold tracking-tight text-white">Editar Item</h2>
