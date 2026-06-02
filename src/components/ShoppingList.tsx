@@ -515,25 +515,30 @@ export default function ShoppingList() {
         )}
       </AnimatePresence>
 
-      {/* Apple Style FAB */}
-      <div className="fixed bottom-10 left-0 right-0 px-6 flex justify-center pointer-events-none z-[70]">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => {
-            if (isFormOpen) {
-              if (!isAddModalOpen) setIsAddModalOpen(true);
-            } else {
-              setIsAddModalOpen(true);
-            }
-            setTimeout(() => inputRef.current?.focus(), 100);
-          }}
-          className="pointer-events-auto bg-blue-500 text-white w-16 h-16 rounded-full shadow-[0_20px_50px_rgba(59,130,246,0.4)] border border-white/20 flex items-center justify-center relative overflow-hidden group transition-all"
-        >
-          <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          <Plus size={32} strokeWidth={2.5} />
-        </motion.button>
-      </div>
+      {/* Apple Style FAB - Apenas na tela principal */}
+      <AnimatePresence>
+        {!isFormOpen && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            className="fixed bottom-10 left-0 right-0 px-6 flex justify-center pointer-events-none z-[70]"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => {
+                setIsAddModalOpen(true);
+                setTimeout(() => inputRef.current?.focus(), 100);
+              }}
+              className="pointer-events-auto bg-blue-500 text-white w-16 h-16 rounded-full shadow-[0_20px_50px_rgba(59,130,246,0.4)] border border-white/20 flex items-center justify-center relative overflow-hidden group transition-all"
+            >
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Plus size={32} strokeWidth={2.5} />
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom Glass Gradient Fade */}
       <div 
@@ -554,116 +559,125 @@ export default function ShoppingList() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-50 bg-black flex flex-col px-6 pt-12 pb-32 overflow-y-auto no-scrollbar"
+            className="fixed inset-0 z-50 bg-black flex flex-col px-6 pt-12 pb-8 overflow-y-auto no-scrollbar"
             style={{ 
               height: visibleHeight > 0 ? `${visibleHeight}px` : '100dvh',
             }}
           >
-            <div className="flex justify-between items-center mb-10 flex-shrink-0">
-              <div className="w-10" /> {/* Spacer */}
-              <h2 className="text-xl font-bold tracking-tight text-white">Adicionar</h2>
-              <button 
-                onClick={() => setIsAddModalOpen(false)}
-                className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
-              >
-                <X size={24} className="text-zinc-400" />
-              </button>
-            </div>
-            
-            <form onSubmit={handleAddItem} className="flex flex-col flex-1">
-              <div className="space-y-8 flex-1">
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">O que comprar?</label>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    placeholder="Ex: Maçã"
-                    value={newItemName}
-                    onChange={(e) => setNewItemName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white text-xl placeholder:text-zinc-600 font-medium"
-                  />
-                </div>
-                
-                {/* Alternatives */}
-                <div className="space-y-3">
-                  {addAlternatives.map((alt, idx) => {
-                    const isVisible = idx === 0 || addAlternatives[idx - 1].trim() !== "";
-                    if (!isVisible) return null;
-
-                    return (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        key={idx} 
-                        className="flex gap-3 items-center"
-                      >
-                        <span className="text-[10px] text-zinc-600 font-black uppercase w-6 text-center">ou</span>
-                        <input
-                          type="text"
-                          placeholder="Outra opção..."
-                          value={alt}
-                          onChange={(e) => {
-                            const newAlts = [...addAlternatives];
-                            newAlts[idx] = e.target.value;
-                            if (e.target.value.trim() !== "" && idx === addAlternatives.length - 1) {
-                              newAlts.push("");
-                            }
-                            setAddAlternatives(newAlts);
-                          }}
-                          className={`flex-1 bg-transparent border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-base ${
-                            alt.trim() === "" 
-                              ? "border-dashed border-white/5 text-zinc-600" 
-                              : "border-solid border-white/10 text-white"
-                          }`}
-                        />
-                        {alt.trim() !== "" && (
-                          <button 
-                            type="button"
-                            onClick={() => setAddAlternatives(addAlternatives.filter((_, i) => i !== idx))}
-                            className="p-2 text-zinc-600 hover:text-red-400"
-                          >
-                            <X size={18} />
-                          </button>
-                        )}
-                      </motion.div>
-                    );
-                  })}
-                </div>
-
-                <div className="flex flex-col items-center pt-6">
-                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-6">Quantidade</label>
-                  <div className="flex items-center gap-10 bg-white/5 border border-white/5 rounded-[32px] px-6 py-3 shadow-inner">
-                    <button
-                      type="button"
-                      onClick={() => setNewItemQuantity(Math.max(1, newItemQuantity - 1))}
-                      className="p-4 text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90"
-                    >
-                      <Minus size={28} />
-                    </button>
-                    <span className="text-4xl font-bold min-w-[2ch] text-center text-white tabular-nums">
-                      {newItemQuantity}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setNewItemQuantity(newItemQuantity + 1)}
-                      className="p-4 text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90"
-                    >
-                      <Plus size={28} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-auto pt-8">
-                <button
-                  type="submit"
-                  disabled={!newItemName.trim()}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-[24px] py-5 font-bold text-xl disabled:opacity-30 disabled:grayscale transition-all active:scale-[0.98] shadow-[0_20px_40px_rgba(59,130,246,0.3)]"
+            <div 
+              className="flex flex-col flex-1"
+              style={{
+                scale: visibleHeight < 600 ? 0.9 : 1,
+                transformOrigin: 'top center',
+                transition: 'scale 0.3s ease-out'
+              }}
+            >
+              <div className="flex justify-between items-center mb-10 flex-shrink-0">
+                <div className="w-10" /> {/* Spacer */}
+                <h2 className="text-xl font-bold tracking-tight text-white">Adicionar</h2>
+                <button 
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
                 >
-                  Adicionar à Lista
+                  <X size={24} className="text-zinc-400" />
                 </button>
               </div>
-            </form>
+              
+              <form onSubmit={handleAddItem} className="flex flex-col flex-1">
+                <div className={`space-y-6 flex-1 ${visibleHeight < 500 ? 'gap-2' : ''}`}>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">O que comprar?</label>
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      placeholder="Ex: Maçã"
+                      value={newItemName}
+                      onChange={(e) => setNewItemName(e.target.value)}
+                      className={`w-full bg-white/5 border border-white/5 rounded-2xl px-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white placeholder:text-zinc-600 font-medium ${visibleHeight < 500 ? 'py-3 text-lg' : 'py-5 text-xl'}`}
+                    />
+                  </div>
+                  
+                  {/* Alternatives */}
+                  <div className="space-y-3">
+                    {addAlternatives.map((alt, idx) => {
+                      const isVisible = idx === 0 || addAlternatives[idx - 1].trim() !== "";
+                      if (!isVisible) return null;
+
+                      return (
+                        <motion.div 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          key={idx} 
+                          className="flex gap-3 items-center"
+                        >
+                          <span className="text-[10px] text-zinc-600 font-black uppercase w-6 text-center">ou</span>
+                          <input
+                            type="text"
+                            placeholder="Outra opção..."
+                            value={alt}
+                            onChange={(e) => {
+                              const newAlts = [...addAlternatives];
+                              newAlts[idx] = e.target.value;
+                              if (e.target.value.trim() !== "" && idx === addAlternatives.length - 1) {
+                                newAlts.push("");
+                              }
+                              setAddAlternatives(newAlts);
+                            }}
+                            className={`flex-1 bg-transparent border rounded-2xl px-5 outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-base ${
+                              alt.trim() === "" 
+                                ? "border-dashed border-white/5 text-zinc-600" 
+                                : "border-solid border-white/10 text-white"
+                            } ${visibleHeight < 500 ? 'py-3' : 'py-4'}`}
+                          />
+                          {alt.trim() !== "" && (
+                            <button 
+                              type="button"
+                              onClick={() => setAddAlternatives(addAlternatives.filter((_, i) => i !== idx))}
+                              className="p-2 text-zinc-600 hover:text-red-400"
+                            >
+                              <X size={18} />
+                            </button>
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex flex-col items-center pt-4">
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-4">Quantidade</label>
+                    <div className={`flex items-center bg-white/5 border border-white/5 rounded-[32px] px-6 py-2 shadow-inner ${visibleHeight < 500 ? 'gap-6' : 'gap-10'}`}>
+                      <button
+                        type="button"
+                        onClick={() => setNewItemQuantity(Math.max(1, newItemQuantity - 1))}
+                        className={`text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90 ${visibleHeight < 500 ? 'p-2' : 'p-4'}`}
+                      >
+                        <Minus size={visibleHeight < 500 ? 22 : 28} />
+                      </button>
+                      <span className={`font-bold min-w-[2ch] text-center text-white tabular-nums ${visibleHeight < 500 ? 'text-2xl' : 'text-4xl'}`}>
+                        {newItemQuantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setNewItemQuantity(newItemQuantity + 1)}
+                        className={`text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90 ${visibleHeight < 500 ? 'p-2' : 'p-4'}`}
+                      >
+                        <Plus size={visibleHeight < 500 ? 22 : 28} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className={`mt-auto ${visibleHeight < 500 ? 'pt-4' : 'pt-8'}`}>
+                  <button
+                    type="submit"
+                    disabled={!newItemName.trim()}
+                    className={`w-full bg-blue-500 hover:bg-blue-600 text-white rounded-[24px] font-bold disabled:opacity-30 disabled:grayscale transition-all active:scale-[0.98] shadow-[0_20px_40px_rgba(59,130,246,0.3)] ${visibleHeight < 500 ? 'py-4 text-lg' : 'py-5 text-xl'}`}
+                  >
+                    Adicionar à Lista
+                  </button>
+                </div>
+              </form>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -676,116 +690,125 @@ export default function ShoppingList() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-50 bg-black flex flex-col px-6 pt-12 pb-32 overflow-y-auto no-scrollbar"
+            className="fixed inset-0 z-50 bg-black flex flex-col px-6 pt-12 pb-8 overflow-y-auto no-scrollbar"
             style={{ 
               height: visibleHeight > 0 ? `${visibleHeight}px` : '100dvh',
             }}
           >
-            <div className="flex justify-between items-center mb-10 flex-shrink-0">
-              <div className="w-10" /> {/* Spacer */}
-              <h2 className="text-xl font-bold tracking-tight text-white">Editar</h2>
-              <button 
-                onClick={() => setEditingItem(null)}
-                className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
-              >
-                <X size={24} className="text-zinc-400" />
-              </button>
-            </div>
-            
-            <form onSubmit={handleEditItem} className="flex flex-col flex-1">
-              <div className="space-y-8 flex-1">
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Nome do item</label>
-                  <input
-                    ref={editInputRef}
-                    type="text"
-                    placeholder="Ex: Maçã"
-                    value={editItemName}
-                    onChange={(e) => setEditItemName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white text-xl placeholder:text-zinc-600 font-medium"
-                  />
-                </div>
-
-                {/* Edit Alternatives */}
-                <div className="space-y-3">
-                  {editAlternatives.map((alt, idx) => {
-                    const isVisible = idx === 0 || editAlternatives[idx - 1].trim() !== "";
-                    if (!isVisible) return null;
-
-                    return (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        key={idx} 
-                        className="flex gap-3 items-center"
-                      >
-                        <span className="text-[10px] text-zinc-600 font-black uppercase w-6 text-center">ou</span>
-                        <input
-                          type="text"
-                          placeholder="Outra opção..."
-                          value={alt}
-                          onChange={(e) => {
-                            const newAlts = [...editAlternatives];
-                            newAlts[idx] = e.target.value;
-                            if (e.target.value.trim() !== "" && idx === editAlternatives.length - 1) {
-                              newAlts.push("");
-                            }
-                            setEditAlternatives(newAlts);
-                          }}
-                          className={`flex-1 bg-transparent border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-base ${
-                            alt.trim() === "" 
-                              ? "border-dashed border-white/5 text-zinc-600" 
-                              : "border-solid border-white/10 text-white"
-                          }`}
-                        />
-                        {alt.trim() !== "" && (
-                          <button 
-                            type="button"
-                            onClick={() => setEditAlternatives(editAlternatives.filter((_, i) => i !== idx))}
-                            className="p-2 text-zinc-600 hover:text-red-400"
-                          >
-                            <X size={18} />
-                          </button>
-                        )}
-                      </motion.div>
-                    );
-                  })}
-                </div>
-
-                <div className="flex flex-col items-center pt-6">
-                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-6">Quantidade</label>
-                  <div className="flex items-center gap-10 bg-white/5 border border-white/5 rounded-[32px] px-6 py-3 shadow-inner">
-                    <button
-                      type="button"
-                      onClick={() => setEditItemQuantity(Math.max(1, editItemQuantity - 1))}
-                      className="p-4 text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90"
-                    >
-                      <Minus size={28} />
-                    </button>
-                    <span className="text-4xl font-bold min-w-[2ch] text-center text-white tabular-nums">
-                      {editItemQuantity}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setEditItemQuantity(editItemQuantity + 1)}
-                      className="p-4 text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90"
-                    >
-                      <Plus size={28} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-auto pt-8">
-                <button
-                  type="submit"
-                  disabled={!editItemName.trim()}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-[24px] py-5 font-bold text-xl disabled:opacity-30 disabled:grayscale transition-all active:scale-[0.98] shadow-[0_20px_40px_rgba(59,130,246,0.3)]"
+            <div 
+              className="flex flex-col flex-1"
+              style={{
+                scale: visibleHeight < 600 ? 0.9 : 1,
+                transformOrigin: 'top center',
+                transition: 'scale 0.3s ease-out'
+              }}
+            >
+              <div className="flex justify-between items-center mb-10 flex-shrink-0">
+                <div className="w-10" /> {/* Spacer */}
+                <h2 className="text-xl font-bold tracking-tight text-white">Editar</h2>
+                <button 
+                  onClick={() => setEditingItem(null)}
+                  className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
                 >
-                  Salvar Alterações
+                  <X size={24} className="text-zinc-400" />
                 </button>
               </div>
-            </form>
+              
+              <form onSubmit={handleEditItem} className="flex flex-col flex-1">
+                <div className={`space-y-6 flex-1 ${visibleHeight < 500 ? 'gap-2' : ''}`}>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Nome do item</label>
+                    <input
+                      ref={editInputRef}
+                      type="text"
+                      placeholder="Ex: Maçã"
+                      value={editItemName}
+                      onChange={(e) => setEditItemName(e.target.value)}
+                      className={`w-full bg-white/5 border border-white/5 rounded-2xl px-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white placeholder:text-zinc-600 font-medium ${visibleHeight < 500 ? 'py-3 text-lg' : 'py-5 text-xl'}`}
+                    />
+                  </div>
+
+                  {/* Edit Alternatives */}
+                  <div className="space-y-3">
+                    {editAlternatives.map((alt, idx) => {
+                      const isVisible = idx === 0 || editAlternatives[idx - 1].trim() !== "";
+                      if (!isVisible) return null;
+
+                      return (
+                        <motion.div 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          key={idx} 
+                          className="flex gap-3 items-center"
+                        >
+                          <span className="text-[10px] text-zinc-600 font-black uppercase w-6 text-center">ou</span>
+                          <input
+                            type="text"
+                            placeholder="Outra opção..."
+                            value={alt}
+                            onChange={(e) => {
+                              const newAlts = [...editAlternatives];
+                              newAlts[idx] = e.target.value;
+                              if (e.target.value.trim() !== "" && idx === editAlternatives.length - 1) {
+                                newAlts.push("");
+                              }
+                              setEditAlternatives(newAlts);
+                            }}
+                            className={`flex-1 bg-transparent border rounded-2xl px-5 outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-base ${
+                              alt.trim() === "" 
+                                ? "border-dashed border-white/5 text-zinc-600" 
+                                : "border-solid border-white/10 text-white"
+                            } ${visibleHeight < 500 ? 'py-3' : 'py-4'}`}
+                          />
+                          {alt.trim() !== "" && (
+                            <button 
+                              type="button"
+                              onClick={() => setEditAlternatives(editAlternatives.filter((_, i) => i !== idx))}
+                              className="p-2 text-zinc-600 hover:text-red-400"
+                            >
+                              <X size={18} />
+                            </button>
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex flex-col items-center pt-4">
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-4">Quantidade</label>
+                    <div className={`flex items-center bg-white/5 border border-white/5 rounded-[32px] px-6 py-2 shadow-inner ${visibleHeight < 500 ? 'gap-6' : 'gap-10'}`}>
+                      <button
+                        type="button"
+                        onClick={() => setEditItemQuantity(Math.max(1, editItemQuantity - 1))}
+                        className={`text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90 ${visibleHeight < 500 ? 'p-2' : 'p-4'}`}
+                      >
+                        <Minus size={visibleHeight < 500 ? 22 : 28} />
+                      </button>
+                      <span className={`font-bold min-w-[2ch] text-center text-white tabular-nums ${visibleHeight < 500 ? 'text-2xl' : 'text-4xl'}`}>
+                        {editItemQuantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setEditItemQuantity(editItemQuantity + 1)}
+                        className={`text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90 ${visibleHeight < 500 ? 'p-2' : 'p-4'}`}
+                      >
+                        <Plus size={visibleHeight < 500 ? 22 : 28} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className={`mt-auto ${visibleHeight < 500 ? 'pt-4' : 'pt-8'}`}>
+                  <button
+                    type="submit"
+                    disabled={!editItemName.trim()}
+                    className={`w-full bg-blue-500 hover:bg-blue-600 text-white rounded-[24px] font-bold disabled:opacity-30 disabled:grayscale transition-all active:scale-[0.98] shadow-[0_20px_40px_rgba(59,130,246,0.3)] ${visibleHeight < 500 ? 'py-4 text-lg' : 'py-5 text-xl'}`}
+                  >
+                    Salvar Alterações
+                  </button>
+                </div>
+              </form>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
