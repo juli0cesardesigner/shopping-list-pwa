@@ -312,6 +312,8 @@ export default function ShoppingList() {
     };
   }
 
+  const isFormOpen = isAddModalOpen || !!editingItem;
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-48">
@@ -321,191 +323,209 @@ export default function ShoppingList() {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto flex flex-col min-h-[100dvh] relative px-4 pt-12 pb-[calc(8rem+env(safe-area-inset-bottom))]">
-      {/* Header Simplificado */}
-      <header className="mb-12 text-center">
-        <h1 className="text-zinc-400 text-sm font-black uppercase tracking-[0.3em]">
-          Lista de Compras
-        </h1>
-      </header>
+    <div className="w-full max-w-md mx-auto flex flex-col min-h-[100dvh] relative px-4 pt-12 pb-[calc(8rem+env(safe-area-inset-bottom))] overflow-x-hidden">
+      {/* Main Interface Wrapper - Oculta quando o formulário está aberto */}
+      <AnimatePresence mode="wait">
+        {!isFormOpen && (
+          <motion.div
+            key="main-list"
+            initial={{ opacity: 1, filter: "blur(0px)" }}
+            animate={{ opacity: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, filter: "blur(20px)", scale: 0.98 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="flex flex-col w-full"
+          >
+            {/* Header Simplificado */}
+            <header className="mb-12 text-center">
+              <h1 className="text-zinc-400 text-sm font-black uppercase tracking-[0.3em]">
+                Lista de Compras
+              </h1>
+            </header>
 
-      {/* Main List Area */}
-      <div className="flex-1 space-y-10">
-        
-        {/* Active Items */}
-        <section className="space-y-4">
-          <div className="grid gap-3">
-            <AnimatePresence mode="popLayout">
-              {activeItems.map((item) => (
-                <motion.div
-                  layout
-                  key={item.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="relative group"
-                >
-                  <div className="bg-[#1c1c1e]/80 backdrop-blur-2xl border border-white/10 rounded-[22px] p-4 shadow-2xl flex items-center justify-between transition-all active:scale-[0.98] active:bg-[#2c2c2e]/90">
-                    <div 
-                      className="flex items-center gap-4 flex-1 cursor-pointer"
-                      onClick={() => toggleComplete(item)}
-                    >
-                      {/* Apple Style Checkbox */}
-                      <div className="w-7 h-7 rounded-full border-2 border-blue-500/50 flex items-center justify-center transition-all hover:border-blue-500 hover:bg-blue-500/10">
-                        <div className="w-3 h-3 rounded-full bg-blue-500 opacity-0 group-hover:opacity-20 transition-opacity" />
-                      </div>
-                      
-                      <div className="flex flex-col overflow-hidden">
-                        <span className="text-lg font-semibold tracking-tight leading-tight text-white truncate">
-                          {parseItemName(item.name).main}
-                        </span>
-                        {parseItemName(item.name).alternatives.length > 0 && (
-                          <div className="flex items-center gap-1.5 mt-1 overflow-hidden">
-                            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-tighter bg-zinc-800/50 px-1.5 py-0.5 rounded-md flex-shrink-0">ou</span>
-                            <span className="text-zinc-400 text-xs font-medium truncate italic">{parseItemName(item.name).alternatives.join(", ")}</span>
+            {/* Main List Area */}
+            <div className="flex-1 space-y-10">
+              
+              {/* Active Items */}
+              <section className="space-y-4">
+                <div className="grid gap-3">
+                  <AnimatePresence mode="popLayout">
+                    {activeItems.map((item) => (
+                      <motion.div
+                        layout
+                        key={item.id}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="relative group"
+                      >
+                        <div className="bg-[#1c1c1e]/80 backdrop-blur-2xl border border-white/10 rounded-[22px] p-4 shadow-2xl flex items-center justify-between transition-all active:scale-[0.98] active:bg-[#2c2c2e]/90">
+                          <div 
+                            className="flex items-center gap-4 flex-1 cursor-pointer"
+                            onClick={() => toggleComplete(item)}
+                          >
+                            {/* Apple Style Checkbox */}
+                            <div className="w-7 h-7 rounded-full border-2 border-blue-500/50 flex items-center justify-center transition-all hover:border-blue-500 hover:bg-blue-500/10">
+                              <div className="w-3 h-3 rounded-full bg-blue-500 opacity-0 group-hover:opacity-20 transition-opacity" />
+                            </div>
+                            
+                            <div className="flex flex-col overflow-hidden">
+                              <span className="text-lg font-semibold tracking-tight leading-tight text-white truncate">
+                                {parseItemName(item.name).main}
+                              </span>
+                              {parseItemName(item.name).alternatives.length > 0 && (
+                                <div className="flex items-center gap-1.5 mt-1 overflow-hidden">
+                                  <span className="text-[9px] font-black text-zinc-500 uppercase tracking-tighter bg-zinc-800/50 px-1.5 py-0.5 rounded-md flex-shrink-0">ou</span>
+                                  <span className="text-zinc-400 text-xs font-medium truncate italic">{parseItemName(item.name).alternatives.join(", ")}</span>
+                                </div>
+                              )}
+                              {item.quantity && parseInt(item.quantity) > 1 && (
+                                <span className="text-blue-400/80 text-[10px] font-bold mt-1 uppercase tracking-widest">{item.quantity} unidades</span>
+                              )}
+                            </div>
                           </div>
-                        )}
-                        {item.quantity && parseInt(item.quantity) > 1 && (
-                          <span className="text-blue-400/80 text-[10px] font-bold mt-1 uppercase tracking-widest">{item.quantity} unidades</span>
-                        )}
-                      </div>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                      <button 
-                        onClick={(e) => openEditModal(item, e)}
-                        className="p-2 text-zinc-500 hover:text-blue-400 transition-colors focus:outline-none"
-                        title="Editar"
-                      >
-                        <Pencil size={18} />
-                      </button>
-                      <button 
-                        onClick={(e) => hideItem(item.id, e)}
-                        className="p-2 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
-                        title="Ocultar"
-                      >
-                        <EyeOff size={18} />
-                      </button>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={(e) => openEditModal(item, e)}
+                              className="p-2 text-zinc-500 hover:text-blue-400 transition-colors focus:outline-none"
+                              title="Editar"
+                            >
+                              <Pencil size={18} />
+                            </button>
+                            <button 
+                              onClick={(e) => hideItem(item.id, e)}
+                              className="p-2 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                              title="Ocultar"
+                            >
+                              <EyeOff size={18} />
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                  {activeItems.length === 0 && items.filter(i => !i.is_hidden).length === 0 && (
+                    <div className="text-center py-20">
+                      <div className="bg-zinc-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/5">
+                          <Plus className="text-zinc-600" size={30} />
+                      </div>
+                      <p className="text-zinc-500 text-sm font-medium">Sua lista está vazia</p>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-            {activeItems.length === 0 && items.filter(i => !i.is_hidden).length === 0 && (
-              <div className="text-center py-20">
-                <div className="bg-zinc-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/5">
-                    <Plus className="text-zinc-600" size={30} />
+                  )}
+                  {activeItems.length === 0 && completedItems.length > 0 && (
+                    <div className="text-center py-10">
+                      <p className="text-zinc-500 text-sm font-medium italic">Tudo comprado! 🎉</p>
+                    </div>
+                  )}
                 </div>
-                <p className="text-zinc-500 text-sm font-medium">Sua lista está vazia</p>
-              </div>
-            )}
-            {activeItems.length === 0 && completedItems.length > 0 && (
-              <div className="text-center py-10">
-                <p className="text-zinc-500 text-sm font-medium italic">Tudo comprado! 🎉</p>
-              </div>
-            )}
-          </div>
-        </section>
+              </section>
 
-        {/* Completed Items Accordion */}
-        {completedItems.length > 0 && (
-          <section className="space-y-4">
-            <button 
-              onClick={() => setIsCompletedOpen(!isCompletedOpen)}
-              className="w-full flex items-center justify-between px-2 group focus:outline-none"
-            >
-              <div className="flex items-center gap-3">
-                <h2 className="text-zinc-500 font-bold text-xs uppercase tracking-widest">Comprados</h2>
-                <span className="bg-zinc-900 text-zinc-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-white/5">
-                  {completedItems.length}
-                </span>
-              </div>
-              <div className={`text-zinc-600 transition-transform duration-500 ${isCompletedOpen ? 'rotate-180' : ''}`}>
-                <ChevronDown size={18} />
-              </div>
-            </button>
-            
-            <AnimatePresence>
-              {isCompletedOpen && (
-                <motion.div 
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden grid gap-2"
-                >
-                  {completedItems.map((item) => (
-                    <motion.div
-                      layout
-                      key={item.id}
-                      onClick={() => toggleComplete(item)}
-                      className="bg-zinc-900/30 backdrop-blur-md border border-white/5 rounded-2xl p-4 flex items-center justify-between opacity-50 grayscale transition-all hover:grayscale-0 hover:opacity-80 cursor-pointer"
-                    >
-                      <div className="flex items-center gap-4 flex-1 overflow-hidden">
-                        <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
-                          <Check size={14} className="text-blue-400" />
-                        </div>
-                        <div className="flex flex-col overflow-hidden">
-                          <span className="text-base font-medium text-zinc-400 line-through decoration-blue-500/30 truncate">
-                            {parseItemName(item.name).main}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-zinc-600 text-xs font-bold tabular-nums">{item.quantity}x</span>
-                        <button 
-                          onClick={(e) => hideItem(item.id, e)}
-                          className="p-1 text-zinc-600 hover:text-zinc-400"
-                        >
-                          <EyeOff size={16} />
-                        </button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </motion.div>
+              {/* Completed Items Accordion */}
+              {completedItems.length > 0 && (
+                <section className="space-y-4">
+                  <button 
+                    onClick={() => setIsCompletedOpen(!isCompletedOpen)}
+                    className="w-full flex items-center justify-between px-2 group focus:outline-none"
+                  >
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-zinc-500 font-bold text-xs uppercase tracking-widest">Comprados</h2>
+                      <span className="bg-zinc-900 text-zinc-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-white/5">
+                        {completedItems.length}
+                      </span>
+                    </div>
+                    <div className={`text-zinc-600 transition-transform duration-500 ${isCompletedOpen ? 'rotate-180' : ''}`}>
+                      <ChevronDown size={18} />
+                    </div>
+                  </button>
+                  
+                  <AnimatePresence>
+                    {isCompletedOpen && (
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden grid gap-2"
+                      >
+                        {completedItems.map((item) => (
+                          <motion.div
+                            layout
+                            key={item.id}
+                            onClick={() => toggleComplete(item)}
+                            className="bg-zinc-900/30 backdrop-blur-md border border-white/5 rounded-2xl p-4 flex items-center justify-between opacity-50 grayscale transition-all hover:grayscale-0 hover:opacity-80 cursor-pointer"
+                          >
+                            <div className="flex items-center gap-4 flex-1 overflow-hidden">
+                              <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
+                                <Check size={14} className="text-blue-400" />
+                              </div>
+                              <div className="flex flex-col overflow-hidden">
+                                <span className="text-base font-medium text-zinc-400 line-through decoration-blue-500/30 truncate">
+                                  {parseItemName(item.name).main}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="text-zinc-600 text-xs font-bold tabular-nums">{item.quantity}x</span>
+                              <button 
+                                onClick={(e) => hideItem(item.id, e)}
+                                className="p-1 text-zinc-600 hover:text-zinc-400"
+                              >
+                                <EyeOff size={16} />
+                              </button>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </section>
               )}
-            </AnimatePresence>
-          </section>
-        )}
 
-        {/* Hidden Items Section */}
-        {hiddenItems.length > 0 && (
-          <section className="space-y-4 pt-4 border-t border-white/5">
-            <h2 className="text-zinc-600 font-bold text-[10px] uppercase tracking-[0.2em] px-2">Ocultos / Lixeira</h2>
-            <div className="grid gap-2">
-              {hiddenItems.map((item) => (
-                <div key={item.id} className="bg-zinc-900/10 border border-dashed border-white/5 rounded-2xl p-4 flex items-center justify-between">
-                  <div className="flex flex-col overflow-hidden">
-                    <span className="text-sm font-medium text-zinc-600 truncate">{item.name}</span>
-                    <span className="text-zinc-700 text-[10px] font-bold">{item.quantity}x</span>
+              {/* Hidden Items Section */}
+              {hiddenItems.length > 0 && (
+                <section className="space-y-4 pt-4 border-t border-white/5">
+                  <h2 className="text-zinc-600 font-bold text-[10px] uppercase tracking-[0.2em] px-2">Ocultos / Lixeira</h2>
+                  <div className="grid gap-2">
+                    {hiddenItems.map((item) => (
+                      <div key={item.id} className="bg-zinc-900/10 border border-dashed border-white/5 rounded-2xl p-4 flex items-center justify-between">
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-sm font-medium text-zinc-600 truncate">{item.name}</span>
+                          <span className="text-zinc-700 text-[10px] font-bold">{item.quantity}x</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button 
+                            onClick={(e) => unhideItem(item.id, e)}
+                            className="p-2 text-zinc-600 hover:text-blue-500"
+                          >
+                            <Eye size={18} />
+                          </button>
+                          <button 
+                            onClick={(e) => deleteItem(item.id, e)}
+                            className="p-2 text-zinc-600 hover:text-red-500"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <button 
-                      onClick={(e) => unhideItem(item.id, e)}
-                      className="p-2 text-zinc-600 hover:text-blue-500"
-                    >
-                      <Eye size={18} />
-                    </button>
-                    <button 
-                      onClick={(e) => deleteItem(item.id, e)}
-                      className="p-2 text-zinc-600 hover:text-red-500"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                </section>
+              )}
             </div>
-          </section>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
 
       {/* Apple Style FAB */}
-      <div className="fixed bottom-10 left-0 right-0 px-6 flex justify-center pointer-events-none z-50">
+      <div className="fixed bottom-10 left-0 right-0 px-6 flex justify-center pointer-events-none z-[70]">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => {
-            setIsAddModalOpen(true);
+            if (isFormOpen) {
+              if (!isAddModalOpen) setIsAddModalOpen(true);
+            } else {
+              setIsAddModalOpen(true);
+            }
             setTimeout(() => inputRef.current?.focus(), 100);
           }}
           className="pointer-events-auto bg-blue-500 text-white w-16 h-16 rounded-full shadow-[0_20px_50px_rgba(59,130,246,0.4)] border border-white/20 flex items-center justify-center relative overflow-hidden group transition-all"
@@ -526,255 +546,247 @@ export default function ShoppingList() {
         }}
       />
 
-      {/* Add Item Modal */}
+      {/* Add Item Form (Full Screen) */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsAddModalOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-md z-40"
-            />
-            <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ 
-                opacity: 1, 
-                y: 0, 
-                scale: visibleHeight < 500 ? 0.85 : 1,
-              }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              style={{ 
-                transformOrigin: 'top center',
-              }}
-              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 w-[94%] max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)] flex flex-col"
-            >
-              <div className="flex justify-between items-center mb-4 flex-shrink-0">
-                <h2 className="text-xl font-bold tracking-tight text-white">Adicionar</h2>
-                <button 
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
-                >
-                  <X size={20} className="text-zinc-400" />
-                </button>
-              </div>
-              
-              <form onSubmit={handleAddItem} className={`flex flex-col ${visibleHeight < 600 ? 'gap-2' : 'gap-5'}`}>
-                <div className={visibleHeight < 600 ? 'space-y-2' : 'space-y-4'}>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">O que comprar?</label>
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      placeholder="Ex: Maçã"
-                      value={newItemName}
-                      onChange={(e) => setNewItemName(e.target.value)}
-                      className={`w-full bg-white/5 border border-white/5 rounded-2xl px-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white placeholder:text-zinc-600 font-medium ${visibleHeight < 600 ? 'py-2.5 text-base' : 'py-4 text-lg'}`}
-                    />
-                  </div>
-                  
-                  {/* Alternatives */}
-                  <div className="space-y-2 mt-2 px-1">
-                    {addAlternatives.map((alt, idx) => {
-                      const isVisible = idx === 0 || addAlternatives[idx - 1].trim() !== "";
-                      if (!isVisible) return null;
-
-                      return (
-                        <div key={idx} className="flex gap-2 items-center">
-                          <span className="text-[10px] text-zinc-600 font-black uppercase w-4 text-center">ou</span>
-                          <input
-                            type="text"
-                            placeholder="Outra opção..."
-                            value={alt}
-                            onChange={(e) => {
-                              const newAlts = [...addAlternatives];
-                              newAlts[idx] = e.target.value;
-                              if (e.target.value.trim() !== "" && idx === addAlternatives.length - 1) {
-                                newAlts.push("");
-                              }
-                              setAddAlternatives(newAlts);
-                            }}
-                            className={`flex-1 bg-transparent border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-sm ${
-                              alt.trim() === "" 
-                                ? "border-dashed border-white/5 text-zinc-600" 
-                                : "border-solid border-white/10 text-white"
-                            }`}
-                          />
-                          {alt.trim() !== "" && (
-                            <button 
-                              type="button"
-                              onClick={() => setAddAlternatives(addAlternatives.filter((_, i) => i !== idx))}
-                              className="p-2 text-zinc-600 hover:text-red-400"
-                            >
-                              <X size={14} />
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex flex-col items-center pt-2">
-                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-4">Quantidade</label>
-                    <div className="flex items-center gap-8 bg-white/5 border border-white/5 rounded-[22px] px-4 py-2 shadow-inner">
-                      <button
-                        type="button"
-                        onClick={() => setNewItemQuantity(Math.max(1, newItemQuantity - 1))}
-                        className="p-3 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                      >
-                        <Minus size={22} />
-                      </button>
-                      <span className="text-2xl font-bold min-w-[2.5ch] text-center text-white tabular-nums">
-                        {newItemQuantity}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setNewItemQuantity(newItemQuantity + 1)}
-                        className="p-3 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                      >
-                        <Plus size={22} />
-                      </button>
-                    </div>
-                  </div>
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-50 bg-black flex flex-col px-6 pt-12 pb-32 overflow-y-auto no-scrollbar"
+            style={{ 
+              height: visibleHeight > 0 ? `${visibleHeight}px` : '100dvh',
+            }}
+          >
+            <div className="flex justify-between items-center mb-10 flex-shrink-0">
+              <div className="w-10" /> {/* Spacer */}
+              <h2 className="text-xl font-bold tracking-tight text-white">Adicionar</h2>
+              <button 
+                onClick={() => setIsAddModalOpen(false)}
+                className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
+              >
+                <X size={24} className="text-zinc-400" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleAddItem} className="flex flex-col flex-1">
+              <div className="space-y-8 flex-1">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">O que comprar?</label>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    placeholder="Ex: Maçã"
+                    value={newItemName}
+                    onChange={(e) => setNewItemName(e.target.value)}
+                    className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white text-xl placeholder:text-zinc-600 font-medium"
+                  />
                 </div>
                 
+                {/* Alternatives */}
+                <div className="space-y-3">
+                  {addAlternatives.map((alt, idx) => {
+                    const isVisible = idx === 0 || addAlternatives[idx - 1].trim() !== "";
+                    if (!isVisible) return null;
+
+                    return (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        key={idx} 
+                        className="flex gap-3 items-center"
+                      >
+                        <span className="text-[10px] text-zinc-600 font-black uppercase w-6 text-center">ou</span>
+                        <input
+                          type="text"
+                          placeholder="Outra opção..."
+                          value={alt}
+                          onChange={(e) => {
+                            const newAlts = [...addAlternatives];
+                            newAlts[idx] = e.target.value;
+                            if (e.target.value.trim() !== "" && idx === addAlternatives.length - 1) {
+                              newAlts.push("");
+                            }
+                            setAddAlternatives(newAlts);
+                          }}
+                          className={`flex-1 bg-transparent border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-base ${
+                            alt.trim() === "" 
+                              ? "border-dashed border-white/5 text-zinc-600" 
+                              : "border-solid border-white/10 text-white"
+                          }`}
+                        />
+                        {alt.trim() !== "" && (
+                          <button 
+                            type="button"
+                            onClick={() => setAddAlternatives(addAlternatives.filter((_, i) => i !== idx))}
+                            className="p-2 text-zinc-600 hover:text-red-400"
+                          >
+                            <X size={18} />
+                          </button>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                <div className="flex flex-col items-center pt-6">
+                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-6">Quantidade</label>
+                  <div className="flex items-center gap-10 bg-white/5 border border-white/5 rounded-[32px] px-6 py-3 shadow-inner">
+                    <button
+                      type="button"
+                      onClick={() => setNewItemQuantity(Math.max(1, newItemQuantity - 1))}
+                      className="p-4 text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90"
+                    >
+                      <Minus size={28} />
+                    </button>
+                    <span className="text-4xl font-bold min-w-[2ch] text-center text-white tabular-nums">
+                      {newItemQuantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setNewItemQuantity(newItemQuantity + 1)}
+                      className="p-4 text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90"
+                    >
+                      <Plus size={28} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-auto pt-8">
                 <button
                   type="submit"
                   disabled={!newItemName.trim()}
-                  className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white rounded-[20px] py-4 font-bold text-lg disabled:opacity-30 disabled:grayscale transition-all active:scale-[0.98] shadow-[0_15px_30px_rgba(59,130,246,0.3)]"
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-[24px] py-5 font-bold text-xl disabled:opacity-30 disabled:grayscale transition-all active:scale-[0.98] shadow-[0_20px_40px_rgba(59,130,246,0.3)]"
                 >
                   Adicionar à Lista
                 </button>
-              </form>
-            </motion.div>
-          </>
+              </div>
+            </form>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Edit Item Modal */}
+      {/* Edit Item Form (Full Screen) */}
       <AnimatePresence>
         {editingItem && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setEditingItem(null)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-md z-40"
-            />
-            <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ 
-                opacity: 1, 
-                y: 0, 
-                scale: visibleHeight < 500 ? 0.85 : 1,
-              }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              style={{ 
-                transformOrigin: 'top center',
-              }}
-              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#1c1c1e]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 w-[94%] max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)] flex flex-col"
-            >
-              <div className="flex justify-between items-center mb-4 flex-shrink-0">
-                <h2 className="text-xl font-bold tracking-tight text-white">Editar Item</h2>
-                <button 
-                  onClick={() => setEditingItem(null)}
-                  className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
-                >
-                  <X size={20} className="text-zinc-400" />
-                </button>
-              </div>
-              
-              <form onSubmit={handleEditItem} className={`flex flex-col ${visibleHeight < 600 ? 'gap-2' : 'gap-5'}`}>
-                <div className={visibleHeight < 600 ? 'space-y-2' : 'space-y-4'}>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Nome do item</label>
-                    <input
-                      ref={editInputRef}
-                      type="text"
-                      placeholder="Ex: Maçã"
-                      value={editItemName}
-                      onChange={(e) => setEditItemName(e.target.value)}
-                      className={`w-full bg-white/5 border border-white/5 rounded-2xl px-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white placeholder:text-zinc-600 font-medium ${visibleHeight < 600 ? 'py-2.5 text-base' : 'py-4 text-lg'}`}
-                    />
-                  </div>
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-50 bg-black flex flex-col px-6 pt-12 pb-32 overflow-y-auto no-scrollbar"
+            style={{ 
+              height: visibleHeight > 0 ? `${visibleHeight}px` : '100dvh',
+            }}
+          >
+            <div className="flex justify-between items-center mb-10 flex-shrink-0">
+              <div className="w-10" /> {/* Spacer */}
+              <h2 className="text-xl font-bold tracking-tight text-white">Editar</h2>
+              <button 
+                onClick={() => setEditingItem(null)}
+                className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
+              >
+                <X size={24} className="text-zinc-400" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleEditItem} className="flex flex-col flex-1">
+              <div className="space-y-8 flex-1">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">Nome do item</label>
+                  <input
+                    ref={editInputRef}
+                    type="text"
+                    placeholder="Ex: Maçã"
+                    value={editItemName}
+                    onChange={(e) => setEditItemName(e.target.value)}
+                    className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-5 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-white text-xl placeholder:text-zinc-600 font-medium"
+                  />
+                </div>
 
-                  {/* Edit Alternatives */}
-                  <div className="space-y-2 mt-2 px-1">
-                    {editAlternatives.map((alt, idx) => {
-                      const isVisible = idx === 0 || editAlternatives[idx - 1].trim() !== "";
-                      if (!isVisible) return null;
+                {/* Edit Alternatives */}
+                <div className="space-y-3">
+                  {editAlternatives.map((alt, idx) => {
+                    const isVisible = idx === 0 || editAlternatives[idx - 1].trim() !== "";
+                    if (!isVisible) return null;
 
-                      return (
-                        <div key={idx} className="flex gap-2 items-center">
-                          <span className="text-[10px] text-zinc-600 font-black uppercase w-4 text-center">ou</span>
-                          <input
-                            type="text"
-                            placeholder="Outra opção..."
-                            value={alt}
-                            onChange={(e) => {
-                              const newAlts = [...editAlternatives];
-                              newAlts[idx] = e.target.value;
-                              if (e.target.value.trim() !== "" && idx === editAlternatives.length - 1) {
-                                newAlts.push("");
-                              }
-                              setEditAlternatives(newAlts);
-                            }}
-                            className={`flex-1 bg-transparent border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-sm ${
-                              alt.trim() === "" 
-                                ? "border-dashed border-white/5 text-zinc-600" 
-                                : "border-solid border-white/10 text-white"
-                            }`}
-                          />
-                          {alt.trim() !== "" && (
-                            <button 
-                              type="button"
-                              onClick={() => setEditAlternatives(editAlternatives.filter((_, i) => i !== idx))}
-                              className="p-2 text-zinc-600 hover:text-red-400"
-                            >
-                              <X size={14} />
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex flex-col items-center pt-2">
-                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-4">Quantidade</label>
-                    <div className="flex items-center gap-8 bg-white/5 border border-white/5 rounded-[22px] px-4 py-2 shadow-inner">
-                      <button
-                        type="button"
-                        onClick={() => setEditItemQuantity(Math.max(1, editItemQuantity - 1))}
-                        className="p-3 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                    return (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        key={idx} 
+                        className="flex gap-3 items-center"
                       >
-                        <Minus size={22} />
-                      </button>
-                      <span className="text-2xl font-bold min-w-[2.5ch] text-center text-white tabular-nums">
-                        {editItemQuantity}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setEditItemQuantity(editItemQuantity + 1)}
-                        className="p-3 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                      >
-                        <Plus size={22} />
-                      </button>
-                    </div>
+                        <span className="text-[10px] text-zinc-600 font-black uppercase w-6 text-center">ou</span>
+                        <input
+                          type="text"
+                          placeholder="Outra opção..."
+                          value={alt}
+                          onChange={(e) => {
+                            const newAlts = [...editAlternatives];
+                            newAlts[idx] = e.target.value;
+                            if (e.target.value.trim() !== "" && idx === editAlternatives.length - 1) {
+                              newAlts.push("");
+                            }
+                            setEditAlternatives(newAlts);
+                          }}
+                          className={`flex-1 bg-transparent border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-blue-500/30 transition-all text-base ${
+                            alt.trim() === "" 
+                              ? "border-dashed border-white/5 text-zinc-600" 
+                              : "border-solid border-white/10 text-white"
+                          }`}
+                        />
+                        {alt.trim() !== "" && (
+                          <button 
+                            type="button"
+                            onClick={() => setEditAlternatives(editAlternatives.filter((_, i) => i !== idx))}
+                            className="p-2 text-zinc-600 hover:text-red-400"
+                          >
+                            <X size={18} />
+                          </button>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                <div className="flex flex-col items-center pt-6">
+                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-6">Quantidade</label>
+                  <div className="flex items-center gap-10 bg-white/5 border border-white/5 rounded-[32px] px-6 py-3 shadow-inner">
+                    <button
+                      type="button"
+                      onClick={() => setEditItemQuantity(Math.max(1, editItemQuantity - 1))}
+                      className="p-4 text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90"
+                    >
+                      <Minus size={28} />
+                    </button>
+                    <span className="text-4xl font-bold min-w-[2ch] text-center text-white tabular-nums">
+                      {editItemQuantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setEditItemQuantity(editItemQuantity + 1)}
+                      className="p-4 text-zinc-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all active:scale-90"
+                    >
+                      <Plus size={28} />
+                    </button>
                   </div>
                 </div>
-                
+              </div>
+              
+              <div className="mt-auto pt-8">
                 <button
                   type="submit"
                   disabled={!editItemName.trim()}
-                  className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white rounded-[20px] py-4 font-bold text-lg disabled:opacity-30 disabled:grayscale transition-all active:scale-[0.98] shadow-[0_15px_30px_rgba(59,130,246,0.3)]"
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-[24px] py-5 font-bold text-xl disabled:opacity-30 disabled:grayscale transition-all active:scale-[0.98] shadow-[0_20px_40px_rgba(59,130,246,0.3)]"
                 >
                   Salvar Alterações
                 </button>
-              </form>
-            </motion.div>
-          </>
+              </div>
+            </form>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
